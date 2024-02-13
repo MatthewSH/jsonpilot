@@ -1,5 +1,12 @@
 const PILOT_KEY = '__pilot'
 
+/**
+ * JSON Pilot specific metadata.
+ *
+ * @export
+ * @interface PilotMetadata
+ * @typedef {PilotMetadata}
+ */
 export interface PilotMetadata {
   __pilot: {
     version: number
@@ -7,22 +14,59 @@ export interface PilotMetadata {
   }
 }
 
+/**
+ * Interface for the source object to be migrated.
+ *
+ * @export
+ * @interface MigrateSource
+ * @typedef {MigrateSource}
+ * @extends {PilotMetadata}
+ */
 export interface MigrateSource extends PilotMetadata {
   [key: string]: any
 }
 
+/**
+ * Interface for a migration version.
+ *
+ * @export
+ * @interface MigrateVersion
+ * @typedef {MigrateVersion}
+ */
 export interface MigrateVersion {
   version: number
   migration: { [key: string]: any }
 }
 
+/**
+ * Array of migration versions.
+ *
+ * @export
+ * @typedef {MigrateVersions}
+ */
 export type MigrateVersions = MigrateVersion[]
 
+/**
+ * Options for the migration function.
+ *
+ * @export
+ * @interface MigrateOptions
+ * @typedef {MigrateOptions}
+ */
 export interface MigrateOptions {
   targetVersion?: number
   sort?: boolean
 }
 
+/**
+ * Migrate the source object to the target version.
+ *
+ * @export
+ * @param {(MigrateSource | { [key: string]: any })} source The source object to be migrated.
+ * @param {MigrateVersions} versions The migration versions.
+ * @param {MigrateOptions} [options={ targetVersion: -1, sort: false }] The migration options.
+ * @returns {MigrateSource}
+ */
 export function migrate(
   source: MigrateSource | { [key: string]: any },
   versions: MigrateVersions,
