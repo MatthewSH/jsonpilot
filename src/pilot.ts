@@ -51,6 +51,14 @@ export function migrate(
       continue
     }
 
+    if (
+      options.targetVersion &&
+      options.targetVersion > 0 &&
+      version.version > options.targetVersion
+    ) {
+      continue
+    }
+
     debug(`Migrating to version ${version.version}`)
 
     clonedSource = addChanges(version.default_data, clonedSource)
