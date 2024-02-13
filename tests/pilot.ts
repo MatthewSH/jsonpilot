@@ -57,6 +57,19 @@ const v3_expectedResult = {
   },
 }
 
+const v2_expectedResult = {
+  __pilot: {
+    last_migrated: 0,
+    version: 2,
+  },
+
+  user: {
+    id: 1,
+    email: '',
+    name: 'Random User',
+  },
+}
+
 test('should migrate from version 1 to version 2', (t) => {
   const source: MigrateSource = {
     name: 'John Doe',
@@ -157,4 +170,78 @@ test('should take a non-pilot object and upgrade it to version 3', (t) => {
   actualResult.__pilot.last_migrated = 0
 
   t.deepEqual(actualResult, v3_expectedResult)
+})
+
+test('should stop at version 2 if requested', (t) => {
+  const source = {
+    user: {
+      id: 1,
+      name: 'Random User',
+    },
+  }
+
+  const actualResult = migrate(source, v3_versions, {
+    targetVersion: 2,
+  })
+
+  // For the sake of simplicity, we're not testing the last_migrated property
+  actualResult.__pilot.last_migrated = 0
+
+  t.deepEqual(actualResult, v2_expectedResult)
+})
+
+test('should not migrate if the source is already at the target version', (t) => {
+  const source = {
+    __pilot: {
+      version: 3,
+      last_migrated: 0,
+    },
+  }
+
+  const actualResult = migrate(source, v3_versions)
+
+  t.deepEqual(actualResult, source)
+})
+
+test('should not migrate if the source is already at the target version (with target version)', (t) => {
+  const source = {
+    __pilot: {
+      version: 3,
+      last_migrated: 0,
+    },
+  }
+
+  const actualResult = migrate(source, v3_versions, {
+    targetVersion: 3,
+  })
+
+  t.deepEqual(actualResult, source)
+})
+
+test('should not migrate if the source version is higher than the target version', (t) => {
+  const source = {
+    __pilot: {
+      version: 4,
+      last_migrated: 0,
+    },
+  }
+
+  const actualResult = migrate(source, v3_versions)
+
+  t.deepEqual(actualResult, source)
+})
+
+test('should not migrate if the source version is higher than the target version (with target version)', (t) => {
+  const source = {
+    __pilot: {
+      version: 4,
+      last_migrated: 0,
+    },
+  }
+
+  const actualResult = migrate(source, v3_versions, {
+    targetVersion: 2,
+  })
+
+  t.deepEqual(actualResult, source)
 })
