@@ -1,6 +1,11 @@
 import test from 'ava'
 
-import { MigrateSource, MigrateVersions, migrate } from '../src/pilot.js'
+import {
+  MigrateSource,
+  MigrateVersion,
+  MigrateVersions,
+  migrate,
+} from '../src/pilot.js'
 
 const v3_versions: MigrateVersions = [
   {
@@ -274,6 +279,72 @@ test('should still have valid migration even with a minimal migration', (t) => {
         },
       },
     },
+  ]
+
+  const source: MigrateSource = {
+    __pilot: {
+      last_migrated: 0,
+      version: 1,
+    },
+
+    user: {
+      id: 1,
+      name: 'Random User',
+    },
+  }
+
+  const actualResult = migrate(source, versions)
+
+  // For the sake of simplicity, we're not testing the last_migrated property
+  actualResult.__pilot.last_migrated = 0
+
+  t.deepEqual(actualResult, v3_expectedResult)
+})
+
+test('should filter out invalid versions', (t) => {
+  const versions: MigrateVersions = [
+    {
+      version: 1,
+      migration: {
+        user: {
+          id: 0,
+          name: '',
+        },
+      },
+    },
+    {
+      version: 2,
+      migration: {
+        user: {
+          email: '',
+        },
+      },
+    },
+    {
+      version: 3,
+      migration: {
+        inventory: {
+          limit: 100,
+          items: [],
+        },
+      },
+    },
+    {
+      version: 4,
+      migration: {},
+    },
+    {
+      version: 5.1,
+      migration: {
+        user: {
+          id: 0,
+          name: '',
+        },
+      },
+    },
+    {
+      version: 6,
+    } as MigrateVersion,
   ]
 
   const source: MigrateSource = {

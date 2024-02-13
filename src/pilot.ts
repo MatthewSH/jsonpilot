@@ -49,6 +49,12 @@ export function migrate(
     (version) => Number.isInteger(version.version) && version.version > 0
   )
 
+  versions = versions.filter(
+    (version) =>
+      version.migration !== undefined &&
+      Object.keys(version.migration).length > 0
+  )
+
   versions = versions.sort((a, b) => a.version - b.version)
 
   for (const version of versions) {
