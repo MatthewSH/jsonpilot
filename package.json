@@ -1,6 +1,6 @@
 {
   "name": "jsonpilot",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "JSON versioning and migration tool",
   "keywords": [
     "json",
