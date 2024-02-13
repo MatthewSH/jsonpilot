@@ -45,6 +45,12 @@ export function migrate(
     return clonedSource as MigrateSource
   }
 
+  versions = versions.filter(
+    (version) => Number.isInteger(version.version) && version.version > 0
+  )
+
+  versions = versions.sort((a, b) => a.version - b.version)
+
   for (const version of versions) {
     if (version.version <= clonedSource.__pilot.version) {
       continue
