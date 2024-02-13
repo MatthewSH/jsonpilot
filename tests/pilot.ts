@@ -5,7 +5,7 @@ import { MigrateSource, MigrateVersions, migrate } from '../src/pilot.js'
 const v3_versions: MigrateVersions = [
   {
     version: 1,
-    default_data: {
+    migration: {
       user: {
         id: 0,
         name: '',
@@ -14,7 +14,7 @@ const v3_versions: MigrateVersions = [
   },
   {
     version: 2,
-    default_data: {
+    migration: {
       user: {
         id: 0,
         email: '',
@@ -24,7 +24,7 @@ const v3_versions: MigrateVersions = [
   },
   {
     version: 3,
-    default_data: {
+    migration: {
       user: {
         id: 0,
         email: '',
@@ -82,13 +82,13 @@ test('should migrate from version 1 to version 2', (t) => {
   const versions: MigrateVersions = [
     {
       version: 1,
-      default_data: {
+      migration: {
         name: 'Default Name',
       },
     },
     {
       version: 2,
-      default_data: {
+      migration: {
         name: 'Default Name',
         age: 0,
       },
@@ -244,4 +244,54 @@ test('should not migrate if the source version is higher than the target version
   })
 
   t.deepEqual(actualResult, source)
+})
+
+test('should still have valid migration even with a minimal migration', (t) => {
+  const versions: MigrateVersions = [
+    {
+      version: 1,
+      migration: {
+        user: {
+          id: 0,
+          name: '',
+        },
+      },
+    },
+    {
+      version: 2,
+      migration: {
+        user: {
+          email: '',
+        },
+      },
+    },
+    {
+      version: 3,
+      migration: {
+        inventory: {
+          limit: 100,
+          items: [],
+        },
+      },
+    },
+  ]
+
+  const source: MigrateSource = {
+    __pilot: {
+      last_migrated: 0,
+      version: 1,
+    },
+
+    user: {
+      id: 1,
+      name: 'Random User',
+    },
+  }
+
+  const actualResult = migrate(source, versions)
+
+  // For the sake of simplicity, we're not testing the last_migrated property
+  actualResult.__pilot.last_migrated = 0
+
+  t.deepEqual(actualResult, v3_expectedResult)
 })

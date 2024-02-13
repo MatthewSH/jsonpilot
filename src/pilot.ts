@@ -12,9 +12,8 @@ export interface MigrateSource extends PilotMetadata {
 }
 
 export interface MigrateVersion {
-  // type: 'object'
   version: number
-  default_data: { [key: string]: any }
+  migration: { [key: string]: any }
 }
 
 export type MigrateVersions = MigrateVersion[]
@@ -27,7 +26,7 @@ export interface MigrateOptions {
 export function migrate(
   source: MigrateSource | { [key: string]: any },
   versions: MigrateVersions,
-  options: MigrateOptions = { targetVersion: -1, sort: true }
+  options: MigrateOptions = { targetVersion: -1, sort: false }
 ): MigrateSource {
   let clonedSource = structuredClone(source) as MigrateSource
 
@@ -61,7 +60,7 @@ export function migrate(
 
     debug(`Migrating to version ${version.version}`)
 
-    clonedSource = addChanges(version.default_data, clonedSource)
+    clonedSource = addChanges(version.migration, clonedSource)
 
     clonedSource.__pilot = {
       version: version.version,
